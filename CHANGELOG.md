@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- The Pi `visual_explainer` tool honors `VISUAL_EXPLAINER_OUTPUT_DIR` for `render` and `render_quick`, like the MCP server. The default stays `~/.agent/diagrams/`; a configured directory must not be a symlink and must resolve to itself, and filenames stay basenames inside it.
+
 ## [0.11.0] - 2026-08-28
 
 ### Highlights
