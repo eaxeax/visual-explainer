@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, mkdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { homedir } from "node:os";
@@ -344,14 +344,14 @@ async function writeRenderedHtml(
   if (configured && realpathSync(outputDir) !== outputDir) {
     throw new Error(`${outputDir} must not contain symlinks and must resolve to itself`);
   }
-  if (existsSync(outputPath) && lstatSync(outputPath).isSymbolicLink()) {
-    throw new Error(`${outputPath} must not be a symlink`);
-  }
+  const existing = lstatSync(outputPath, { throwIfNoEntry: false });
+  if (existing?.isSymbolicLink()) throw new Error(`${outputPath} must not be a symlink`);
 
   signal?.throwIfAborted();
   const temporaryPath = `${outputPath}.${process.pid}.${randomUUID()}.tmp`;
   try {
     writeFileSync(temporaryPath, html, { encoding: "utf8", flag: "wx" });
+    if (existing) chmodSync(temporaryPath, existing.mode & 0o7777);
     renameSync(temporaryPath, outputPath);
   } finally {
     rmSync(temporaryPath, { force: true });
