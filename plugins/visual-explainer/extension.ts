@@ -1,5 +1,6 @@
-import { existsSync, lstatSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import type { AgentToolResult, ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -348,7 +349,13 @@ async function writeRenderedHtml(
   }
 
   signal?.throwIfAborted();
-  writeFileSync(outputPath, html, "utf8");
+  const temporaryPath = `${outputPath}.${process.pid}.${randomUUID()}.tmp`;
+  try {
+    writeFileSync(temporaryPath, html, { encoding: "utf8", flag: "wx" });
+    renameSync(temporaryPath, outputPath);
+  } finally {
+    rmSync(temporaryPath, { force: true });
+  }
 
   signal?.throwIfAborted();
 

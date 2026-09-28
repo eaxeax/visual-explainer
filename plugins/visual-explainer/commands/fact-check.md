@@ -3,7 +3,7 @@ name: fact-check
 description: Verify a generated document against actual code and git history
 ---
 
-Load the visual-explainer skill and fact-check the document named by `$@`. If no argument is given, use the most recently modified HTML file in `~/.agent/diagrams/`.
+Load the visual-explainer skill and fact-check the document named by `$@`. If no argument is given, use the most recently modified HTML file in the output directory: the directory named by the `VISUAL_EXPLAINER_OUTPUT_DIR` environment variable when it is set (a relative value resolves against the working directory), otherwise `~/.agent/diagrams/`.
 
 ## Claim extraction
 
